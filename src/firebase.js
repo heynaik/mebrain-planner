@@ -1,8 +1,8 @@
 // src/firebase.js
 import { initializeApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
+import { getAuth, GoogleAuthProvider } from "firebase/auth";
 
-// Your Firebase config (copy from Firebase Console → Project Settings → Web App SDK snippet)
 const firebaseConfig = {
   apiKey: "AIzaSyBVHESkuuE5e2CIJviyPbq-2Jnn8tbJwQw",
   authDomain: "mebrainplanner.firebaseapp.com",
@@ -13,11 +13,7 @@ const firebaseConfig = {
   measurementId: "G-G6208N8EV4",
 };
 
-// Initialize Firebase
 const app = initializeApp(firebaseConfig);
-
-// Initialize Firestore database
-const db = getFirestore(app);
-
-// Export database
-export { db };
+export const db = getFirestore(app);
+export const auth = getAuth(app);
+export const provider = new GoogleAuthProvider();

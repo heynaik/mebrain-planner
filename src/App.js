@@ -1,58 +1,41 @@
 // src/App.js
 import React, { useEffect, useState } from "react";
-import { collection, getDocs } from "firebase/firestore";
-import { db } from "./firebase";
-import Header from "./components/Header";
-import ThemeToggle from "./components/ThemeToggle";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import { onAuthStateChanged, signOut } from "firebase/auth";
+import { auth } from "./firebase";
 import Planner from "./pages/Planner";
+import Login from "./pages/Login";
+import Header from "./components/Header";
 
-function App() {
-  const [isFirebaseConnected, setIsFirebaseConnected] = useState(false);
+export default function App() {
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    async function testConnection() {
-      try {
-        // Attempt to read from a collection called "test"
-        const querySnapshot = await getDocs(collection(db, "test"));
-        console.log("✅ Firebase connection successful");
-        setIsFirebaseConnected(true);
-      } catch (error) {
-        console.error("❌ Firebase connection failed:", error);
-        setIsFirebaseConnected(false);
-      }
-    }
-    testConnection();
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser);
+      setLoading(false);
+    });
+    return () => unsubscribe();
   }, []);
 
+  if (loading) return <div className="text-center mt-20 text-lg">Loading...</div>;
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 to-gray-800 text-white">
-      {/* Header */}
-      <Header />
-      
-      {/* Theme Toggle */}
-      <div className="absolute top-5 right-5">
-        <ThemeToggle />
-      </div>
+    <Router>
+      {user && <Header user={user} onLogout={() => signOut(auth)} />}
 
-      {/* Firebase Connection Status */}
-      <div className="text-center mt-6">
-        {isFirebaseConnected ? (
-          <span className="text-green-400 font-semibold">
-            ✅ Firebase Connected Successfully
-          </span>
-        ) : (
-          <span className="text-red-400 font-semibold">
-            ❌ Firebase Connection Failed
-          </span>
-        )}
-      </div>
-
-      {/* Planner Page */}
-      <main className="p-6">
-        <Planner />
-      </main>
-    </div>
+      <Routes>
+        <Route path="/" element={<Navigate to={user ? "/planner" : "/login"} />} />
+        <Route
+          path="/planner"
+          element={user ? <Planner user={user} /> : <Navigate to="/login" />}
+        />
+        <Route
+          path="/login"
+          element={!user ? <Login /> : <Navigate to="/planner" />}
+        />
+      </Routes>
+    </Router>
   );
 }
-
-export default App;
