@@ -1,9 +1,11 @@
+// src/components/Header.jsx
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { signOut } from "firebase/auth";
 import { auth } from "../firebase";
 import ThemeToggle from "./ThemeToggle";
 import ProfileDropdown from "./ProfileDropdown";
+import { StickyNote } from "lucide-react"; // 🆕 Added Notes Icon
 
 export default function Header({ user }) {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -29,13 +31,26 @@ export default function Header({ user }) {
   return (
     <header className="flex items-center justify-between px-4 py-3 sm:px-6 sm:py-4 bg-white dark:bg-[#0f172a] shadow-sm fixed top-0 left-0 w-full z-50">
       {/* Logo */}
-      <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">
+      <h1
+        className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white cursor-pointer"
+        onClick={() => navigate("/planner")}
+      >
         Me<span className="text-indigo-500">Brain</span>
       </h1>
 
       {/* Controls */}
       <div className="flex items-center gap-2 sm:gap-4 relative">
+        {/* Theme toggle */}
         <ThemeToggle />
+
+        {/* 📝 Notes Icon */}
+        <button
+          onClick={() => navigate("/notes")}
+          className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition"
+          title="Notes"
+        >
+          <StickyNote className="w-5 h-5 text-gray-700 dark:text-gray-300" />
+        </button>
 
         {/* Profile */}
         <div className="relative">
